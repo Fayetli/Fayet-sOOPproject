@@ -1,7 +1,5 @@
 ﻿#include <iostream>
 #include <vector>
-#include "Heroes.h"
-#include "Hero.h"
 //bugs: 0?
 using namespace std;
 
