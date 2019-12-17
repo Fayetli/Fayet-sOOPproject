@@ -27,7 +27,11 @@ short int setHeroID() {
 
 class Hero {
 public:
-	Hero() : id(setHeroID()) {}
+	Hero() : id(setHeroID()) {
+		name = "~~~";
+		damage = 0;
+		speed = 0;
+	}
 	Hero(string name, int hp, short int damage, short int speed) :name(name), hp(hp),
 		damage(damage), speed(speed), id(setHeroID()) {}
 	void printInfo() {
@@ -45,7 +49,6 @@ public:
 private:
 
 };
-
 vector<Hero> heroes(0);
 
 short int setID() {
@@ -91,11 +94,11 @@ public:
 
 	string name;
 private:
-	short int rank;
-	short int id;
+	short int rank = 1000;
+	short int id = 0;
 
 };
-vector<Player> players(10);
+vector<Player> players(0);
 
 class PlayerManager {
 public:
@@ -120,6 +123,9 @@ public:
 	void addPlayer(string name) {
 		players.resize(players.size() + 1);
 		players[players.size() - 1].name = name;
+		sv::players << name << endl;
+		sv::players << 1000 << endl;
+		sv::players << players[players.size() - 1].getId() << endl;
 	}
 	void addPlayer() {
 		cout << "Enter name: " << flush;
@@ -127,11 +133,15 @@ public:
 		cin >> name;
 		players.resize(players.size() + 1);
 		players[players.size() - 1].name = name;
+		sv::players << name << endl;
+		sv::players << 1000 << endl;
+		sv::players << players[players.size() - 1].getId() << endl;
 	}
 	void removePlayer(short int number) {
 		players.erase(players.begin() + number - 1);
 	}
 };
+PlayerManager toPlayers;
 
 class TeamPart {
 public:
@@ -148,24 +158,22 @@ private:
 
 };
 vector<TeamPart> toTeamPart(10);
-PlayerManager toPlayers;
+
 
 class Session {
 public:
-	Session() {}
-
-	~Session() {
-		delete[] TeamRed;
-		delete[] TeamBlue;
-	}
+	Session() {};
 	void setWinner(bool i) {
 		winner = i;
 	}
 	bool getWinner() {
 		return winner;
 	}
+	
 	TeamPart* TeamBlue = new TeamPart[5];
 	TeamPart* TeamRed = new TeamPart[5];
+	//vector<TeamPart> TeamRed(5);
+	//vector<TeamPart> TeamBlue(5);
 private:
 	bool winner;
 };
@@ -237,7 +245,6 @@ public:
 		//create a session object
 		sessionList.resize(sessionList.size() + 1);
 		int sessionNumber = sessionList.size();
-
 		//create session
 
 		//player selection system
@@ -282,12 +289,11 @@ public:
 		} //randomize player-hero
 
 
-		int k = 0;
-		for (int i = 0; i < 5; i++, k++) {
+		
+		for (int i = 0, k = 0; i < 5; i++, k++) {
 			sessionList[sessionNumber - 1].TeamRed[k] = toTeamPart[i];
 		}
-		k = 0;
-		for (int i = 5; i < 10; i++, k++) {
+		for (int i = 5, k = 0; i < 10; i++, k++) {
 			sessionList[sessionNumber - 1].TeamBlue[k] = toTeamPart[i];
 		}
 
@@ -325,14 +331,26 @@ public:
 
 		for (int i = 0; i < 5; i++) {
 			sv::sessionList << sessionList[sessionNumber - 1].TeamRed[i].player.name << endl;
-			sv::sessionList << sessionList[sessionNumber - 1].TeamRed[i].player.getRank() << endl;
-			sv::sessionList << sessionList[sessionNumber - 1].TeamRed[i].player.getId() << endl;
-			sv::sessionList << sessionList[sessionNumber - 1].TeamRed[i].hero.name << endl;
 		}
 		for (int i = 0; i < 5; i++) {
 			sv::sessionList << sessionList[sessionNumber - 1].TeamBlue[i].player.name << endl;
+		}
+		for (int i = 0; i < 5; i++) {
+			sv::sessionList << sessionList[sessionNumber - 1].TeamRed[i].player.getRank() << endl;
+		}
+		for (int i = 0; i < 5; i++) {
 			sv::sessionList << sessionList[sessionNumber - 1].TeamBlue[i].player.getRank() << endl;
+		}
+		for (int i = 0; i < 5; i++) {
+			sv::sessionList << sessionList[sessionNumber - 1].TeamRed[i].player.getId() << endl;
+		}
+		for (int i = 0; i < 5; i++) {
 			sv::sessionList << sessionList[sessionNumber - 1].TeamBlue[i].player.getId() << endl;
+		}
+		for (int i = 0; i < 5; i++) {
+			sv::sessionList << sessionList[sessionNumber - 1].TeamRed[i].hero.name << endl;
+		}
+		for (int i = 0; i < 5; i++) {
 			sv::sessionList << sessionList[sessionNumber - 1].TeamBlue[i].hero.name << endl;
 		}
 		sv::sessionList << "end" << endl;
@@ -345,13 +363,10 @@ int main()
 	srand(time(0));
 
 
-
 	string line;
-	int i = 0;
-
 
 	//read heroes
-	for (; getline(ss::heroes, line); i++) {
+	for (int i = 0; getline(ss::heroes, line); i++) {
 		heroes.resize(heroes.size() + 1);
 		heroes[i].name = line;
 		getline(ss::heroes, line);
@@ -362,64 +377,92 @@ int main()
 		heroes[i].hp = atoi(line.c_str());
 		getline(ss::heroes, line);
 		heroes[i].id = atoi(line.c_str());
+		heroCount = i;
 	}//input heroes from text file to vector
-	heroCount = i;
-	i = 0;
-	/*for (int i = 0; i < 10; i++) {
+
+	/*for (int i = 0; i < heroes.size(); i++) {
 		heroes[i].printInfo();
 	}*/
 
 
 	//read players
-	for (; getline(ss::players, line); i++) {
+	for (int i = 0; getline(ss::players, line); i++) {
 		players.resize(players.size() + 1);
 		players[i].name = line;
 		getline(ss::players, line);
 		players[i].setRank(atoi(line.c_str()));
 		getline(ss::players, line);
 		players[i].setId(atoi(line.c_str()));
+		playerCount = i;
 	}//input players from text file to vector
-	playerCount = i;
-	i = 0;
+
 	/*for (int i = 0; i < 10; i++) {
 		players[i].printInfo();
 	}*/
 
+
+	//Отут питався зчитувать Лист сесій, "майже" считує вроде нормально, але є проблема з ресайзом вектора з сесіями.
+	//Коли він юзається данні всіх попередніх сесій кудись пропадають, і з пам'яттю твориться непонятна дічь(для мене).
+	//Предполагаю, що це через те, що в классі Сесії присутні \массиви\ з елементами ТімПартов.(но це не точно).
+	//Якщо не юзать resize, push_back. То паше(але це не те, що потрібно).
+	//Якщо забить болт на зчитування файлу сессій. То програма нормально записує "інформацію" про сессію в файл
+	//Але знову ж, при створенні сесії юзається resize, яке чомусь багано(в мене) працює, 
+	//якщо було попередньо зчитано інфу з файлу.
+	//В общем тут я застряг.  ------і забив болт------
+
+	/*
 	//read sessions //now doesn`t work, to fix
 	i = 0;
-	/*for (; getline(ss::sessionList, line); i++) {
-		sessionList.resize(sessionList.size() + 1);
-		sessionList[i].setWinner(atoi(line.c_str()));
+	//////////////////////////////////////////////////////////////////////////
+	vector<Session> session(20);
+	while (getline(ss::sessionList, line)) {
+		//sessionList.resize(sessionList.size() + 1);
+		cout << i << endl;
+		session[i].setWinner(atoi(line.c_str()));
 		getline(ss::sessionList, line);
-		for (int j = 0, p = 0; j < 5; j++, p++) {
+		for (int j = 0; j < 10; j++) {
 			toTeamPart[j].player.name = line;
 			getline(ss::sessionList, line);
-			toTeamPart[j].player.setRank(atoi(line.c_str()));
-			getline(ss::sessionList, line);
-			toTeamPart[j].player.setId(atoi(line.c_str()));
-			getline(ss::sessionList, line);
-			toTeamPart[j].hero.name = line;                          //bug here
-			getline(ss::sessionList, line);
-			sessionList[i].TeamRed[p] = toTeamPart[j];
 		}
-		for (int j = 5, p = 0; j < 10; j++, p++) {
-			toTeamPart[j].player.name = line;
-			getline(ss::sessionList, line);
+		
+		for (int j = 0; j < 10; j++) {
 			toTeamPart[j].player.setRank(atoi(line.c_str()));
 			getline(ss::sessionList, line);
+		}
+		
+		for (int j = 0; j < 10; j++) {
 			toTeamPart[j].player.setId(atoi(line.c_str()));
 			getline(ss::sessionList, line);
+		}
+		
+		for (int j = 0; j < 10; j++) {
 			toTeamPart[j].hero.name = line;
-			sessionList[i].TeamBlue[p] = toTeamPart[j];
 			getline(ss::sessionList, line);
 		}
+		
+		for (int j = 0; j < 5; j++) {
+			session[i].TeamRed[j] = toTeamPart[j];
+		}
+		
+		for (int j = 5, i = 0; j < 10; j++, i++) {
+			session[i].TeamBlue[i] = toTeamPart[j];
+		}
 
-	}//input sessions from text file to vector*/
-	i = 0;
-
-	toHeroes.addHero("kek", 300, 300, 300);
-	toPlayers.addPlayer("bullshit");
-
+		//sessionList.push_back(session[i]);
+		for (int i = 0; i < sessionList.size(); i++) {
+			for (int j = 0; j < 5; j++) {
+				sessionList[i].TeamBlue[j].printInfo();
+				sessionList[i].TeamRed[j].printInfo();
+			}
+		}
+		cout << ++i << endl;
+	}//input sessions from text file to vector
+	sessionList.resize(i);
+	for (int j = 0; j < i; j++) {
+		sessionList[j] = session[j];
+	}//buuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuugs
+	///////////////////////////////////////////////////////////////////////////////////////////////*/
+	
 	short int arrayPlayerRank[10] = { 1187, 1105, 1100, 1095, 1035, 1050, 1175, 1157, 1108, 1083 };
 	for (int i = 0; i < 10; i++) {
 		players[i].setRank(arrayPlayerRank[i]);
@@ -432,21 +475,29 @@ int main()
 		finders.resize(finders.size() + 1);
 		finders[i] = players[i];
 	}//example
-	 //must to create a system to add a player who find a match and...
 
-
-
+	 //десь тут предполагається створення вектора в який потоком, напевно, будуть 
+	//записуватись плеєри, які шукають ігру, або їхні ID(но тоді трохи треба переписати цей гавно код)
 
 	int sessionNumber = games.performGameSesion();
 	//start game
 
+	
 
-
+	
 	//end game
 	sessionList[sessionNumber - 1].setWinner(0); //set winner
+
+
 	games.endGameSession(sessionNumber);
 
-
+	
+	for (int i = 0; i < sessionList.size(); i++) {
+		for (int j = 0; j < 5; j++) {
+			sessionList[i].TeamBlue[j].printInfo();
+			sessionList[i].TeamRed[j].printInfo();
+		}
+	}
 
 	system("pause");
 
