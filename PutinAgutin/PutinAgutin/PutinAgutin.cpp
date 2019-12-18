@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 //bugs: 0?
+/*ListOfHeroesm ListOfPlayers, ListOfSession реалізовані через глобальні вектори*/
 using namespace std;
 
 short int playerCount = 0;
@@ -28,9 +29,6 @@ short int setHeroID() {
 class Hero {
 public:
 	Hero() : id(setHeroID()) {
-		name = "~~~";
-		damage = 0;
-		speed = 0;
 	}
 	Hero(string name, int hp, short int damage, short int speed) :name(name), hp(hp),
 		damage(damage), speed(speed), id(setHeroID()) {}
@@ -169,7 +167,7 @@ public:
 	bool getWinner() {
 		return winner;
 	}
-	
+
 	TeamPart* TeamBlue = new TeamPart[5];
 	TeamPart* TeamRed = new TeamPart[5];
 	//vector<TeamPart> TeamRed(5);
@@ -186,6 +184,13 @@ public:
 			if (heroes[i].name == name) {
 				heroes[i].printInfo();
 				break;
+			}
+		}
+	}
+	int getHeroByName(string name) {
+		for (int i = 0; i < heroes.size(); i++) {
+			if (heroes[i].name == name) {
+				return i;
 			}
 		}
 	}
@@ -245,7 +250,6 @@ public:
 		//create a session object
 		sessionList.resize(sessionList.size() + 1);
 		int sessionNumber = sessionList.size();
-		//create session
 
 		//player selection system
 		int randomFinder = rand() % finders.size();
@@ -256,9 +260,11 @@ public:
 		short int maxRank = toTeamPart[0].player.getRank();
 		short int nowCount = 1;
 
+		//200 in same team
+		//but dont 100 between teams
+
 		while (true) {
 			randomFinder = rand() % finders.size();
-			//cout << randomFinder << endl;
 			if (nowCount < 5) {
 				if (finders[randomFinder].getRank() < minRank + 200 && finders[randomFinder].getRank() > maxRank - 200) {
 					toTeamPart[++nowCount - 1].player = finders[randomFinder];
@@ -289,7 +295,7 @@ public:
 		} //randomize player-hero
 
 
-		
+
 		for (int i = 0, k = 0; i < 5; i++, k++) {
 			sessionList[sessionNumber - 1].TeamRed[k] = toTeamPart[i];
 		}
@@ -401,68 +407,53 @@ int main()
 	}*/
 
 
-	//Отут питався зчитувать Лист сесій, "майже" считує вроде нормально, але є проблема з ресайзом вектора з сесіями.
-	//Коли він юзається данні всіх попередніх сесій кудись пропадають, і з пам'яттю твориться непонятна дічь(для мене).
-	//Предполагаю, що це через те, що в классі Сесії присутні \массиви\ з елементами ТімПартов.(но це не точно).
-	//Якщо не юзать resize, push_back. То паше(але це не те, що потрібно).
-	//Якщо забить болт на зчитування файлу сессій. То програма нормально записує "інформацію" про сессію в файл
-	//Але знову ж, при створенні сесії юзається resize, яке чомусь багано(в мене) працює, 
-	//якщо було попередньо зчитано інфу з файлу.
-	//В общем тут я застряг.  ------і забив болт------
-
-	/*
-	//read sessions //now doesn`t work, to fix
-	i = 0;
-	//////////////////////////////////////////////////////////////////////////
+	//read sessions
+	int i = 0;
 	vector<Session> session(20);
 	while (getline(ss::sessionList, line)) {
-		//sessionList.resize(sessionList.size() + 1);
-		cout << i << endl;
-		session[i].setWinner(atoi(line.c_str()));
+		session[i].setWinner(atoi(line.c_str())); //read winner(1 - blue, 0 - red)
 		getline(ss::sessionList, line);
 		for (int j = 0; j < 10; j++) {
 			toTeamPart[j].player.name = line;
 			getline(ss::sessionList, line);
 		}
-		
+
 		for (int j = 0; j < 10; j++) {
 			toTeamPart[j].player.setRank(atoi(line.c_str()));
 			getline(ss::sessionList, line);
 		}
-		
+
 		for (int j = 0; j < 10; j++) {
 			toTeamPart[j].player.setId(atoi(line.c_str()));
 			getline(ss::sessionList, line);
 		}
-		
+
 		for (int j = 0; j < 10; j++) {
 			toTeamPart[j].hero.name = line;
 			getline(ss::sessionList, line);
 		}
-		
+		for (int j = 0; j < 10; j++) {
+			toTeamPart[j].hero.damage = heroes[toHeroes.getHeroByName(toTeamPart[j].hero.name)].damage;
+			toTeamPart[j].hero.speed = heroes[toHeroes.getHeroByName(toTeamPart[j].hero.name)].speed;
+			toTeamPart[j].hero.hp = heroes[toHeroes.getHeroByName(toTeamPart[j].hero.name)].hp;
+		}
 		for (int j = 0; j < 5; j++) {
 			session[i].TeamRed[j] = toTeamPart[j];
 		}
-		
-		for (int j = 5, i = 0; j < 10; j++, i++) {
-			session[i].TeamBlue[i] = toTeamPart[j];
+
+		for (int j = 5, k = 0; j < 10; j++, k++) {
+			session[i].TeamBlue[k] = toTeamPart[j];
 		}
 
-		//sessionList.push_back(session[i]);
-		for (int i = 0; i < sessionList.size(); i++) {
-			for (int j = 0; j < 5; j++) {
-				sessionList[i].TeamBlue[j].printInfo();
-				sessionList[i].TeamRed[j].printInfo();
-			}
-		}
-		cout << ++i << endl;
+		sessionList.push_back(session[i]);
 	}//input sessions from text file to vector
-	sessionList.resize(i);
-	for (int j = 0; j < i; j++) {
-		sessionList[j] = session[j];
-	}//buuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuugs
-	///////////////////////////////////////////////////////////////////////////////////////////////*/
-	
+	/*for (int i = 0; i < sessionList.size(); i++) {
+		for (int j = 0; j < 5; j++) {
+			sessionList[i].TeamRed[j].printInfo();
+			sessionList[i].TeamBlue[j].printInfo();
+		}
+	}*/
+
 	short int arrayPlayerRank[10] = { 1187, 1105, 1100, 1095, 1035, 1050, 1175, 1157, 1108, 1083 };
 	for (int i = 0; i < 10; i++) {
 		players[i].setRank(arrayPlayerRank[i]);
@@ -482,22 +473,21 @@ int main()
 	int sessionNumber = games.performGameSesion();
 	//start game
 
-	
 
-	
+
+
 	//end game
 	sessionList[sessionNumber - 1].setWinner(0); //set winner
 
-
 	games.endGameSession(sessionNumber);
 
-	
-	for (int i = 0; i < sessionList.size(); i++) {
+
+	/*for (int i = 0; i < sessionList.size(); i++) {
 		for (int j = 0; j < 5; j++) {
 			sessionList[i].TeamBlue[j].printInfo();
 			sessionList[i].TeamRed[j].printInfo();
 		}
-	}
+	}*/
 
 	system("pause");
 
