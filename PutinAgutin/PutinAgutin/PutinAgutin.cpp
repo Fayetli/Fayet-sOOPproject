@@ -274,12 +274,20 @@ public:
 			if (nowCount < 5) {
 				if (finders[randomFinder].getRank() < minRank + 200 && finders[randomFinder].getRank() > maxRank - 200) {
 					toTeamPart[++nowCount - 1].player = finders[randomFinder];
+					if (finders[randomFinder].getRank() > maxRank)
+						maxRank = finders[randomFinder].getRank();
+					if (finders[randomFinder].getRank() < minRank)
+						minRank = finders[randomFinder].getRank();
 					finders.erase(finders.begin() + randomFinder);
 				}
 			}
 			else if (nowCount >= 5 && nowCount < 10) {
 				if (finders[randomFinder].getRank() < minRank + 200 && finders[randomFinder].getRank() > maxRank - 200) {
 					toTeamPart[++nowCount - 1].player = finders[randomFinder];
+					if (finders[randomFinder].getRank() > maxRank)
+						maxRank = finders[randomFinder].getRank();
+					if (finders[randomFinder].getRank() < minRank)
+						minRank = finders[randomFinder].getRank();
 					finders.erase(finders.begin() + randomFinder);
 				}
 			}
