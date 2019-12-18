@@ -12,9 +12,6 @@
 
 using namespace std;
 
-short int playerCount = 0;
-short int heroCount = 0;
-
 //toRead
 namespace ss {
 	ifstream sessionList("sessionList.txt");
@@ -28,16 +25,12 @@ namespace sv {
 	ofstream heroes("heroes.txt", ios::app);
 }
 
-short int setHeroID() {
-	return ++heroCount;
-}
-
 class Hero {
 public:
-	Hero() : id(setHeroID()) {
+	Hero() : id(++count) {
 	}
 	Hero(string name, int hp, short int damage, short int speed) :name(name), hp(hp),
-		damage(damage), speed(speed), id(setHeroID()) {}
+		damage(damage), speed(speed), id(++count) {}
 	void printInfo() {
 		cout << "Hero: " << name << endl
 			<< "HP: " << hp << endl
@@ -47,23 +40,21 @@ public:
 	}
 	string name;
 	int hp;
+	static int count;
 	short int damage;
 	short int speed;
 	short int id;
 private:
 
 };
+int Hero::count = 0;
 vector<Hero> heroes(0);
-
-short int setID() {
-	return ++playerCount;
-}
 
 class Player {
 public:
-	Player() :id(setID()), rank(1000) {}
-	Player(string name) :name(name), rank(1000), id(setID()) {}
-
+	Player() :id(++count), rank(1000) {}
+	Player(string name) :name(name), rank(1000), id(++count) {}
+	static int count;
 	void changeName() {
 		cout << "Enter new name: " << flush;
 		string name;
@@ -102,6 +93,7 @@ private:
 	short int id = 0;
 
 };
+int Player::count = 0;
 vector<Player> players(0);
 
 class PlayerManager {
@@ -162,7 +154,6 @@ private:
 
 };
 vector<TeamPart> toTeamPart(10);
-
 
 class Session {
 public:
@@ -241,7 +232,6 @@ public:
 		for (int i = 0; i < heroes.size(); i++) {
 			heroes[i].id = i + 1;
 		}
-		heroCount--;
 	}
 };
 HeroManager toHeroes;
@@ -271,17 +261,7 @@ public:
 
 		while (true) {
 			randomFinder = rand() % finders.size();
-			if (nowCount < 5) {
-				if (finders[randomFinder].getRank() < minRank + 200 && finders[randomFinder].getRank() > maxRank - 200) {
-					toTeamPart[++nowCount - 1].player = finders[randomFinder];
-					if (finders[randomFinder].getRank() > maxRank)
-						maxRank = finders[randomFinder].getRank();
-					if (finders[randomFinder].getRank() < minRank)
-						minRank = finders[randomFinder].getRank();
-					finders.erase(finders.begin() + randomFinder);
-				}
-			}
-			else if (nowCount >= 5 && nowCount < 10) {
+			if (nowCount < 10) {
 				if (finders[randomFinder].getRank() < minRank + 200 && finders[randomFinder].getRank() > maxRank - 200) {
 					toTeamPart[++nowCount - 1].player = finders[randomFinder];
 					if (finders[randomFinder].getRank() > maxRank)
@@ -396,13 +376,12 @@ int main()
 		heroes[i].hp = atoi(line.c_str());
 		getline(ss::heroes, line);
 		heroes[i].id = atoi(line.c_str());
-		heroCount = i;
 	}//input heroes from text file to vector
 
 	//output heroes
-	/*for (int i = 0; i < heroes.size(); i++) {
+	for (int i = 0; i < heroes.size(); i++) {
 		heroes[i].printInfo();
-	}*/
+	}
 
 
 	//read players
@@ -413,17 +392,15 @@ int main()
 		players[i].setRank(atoi(line.c_str()));
 		getline(ss::players, line);
 		players[i].setId(atoi(line.c_str()));
-		playerCount = i;
 	}//input players from text file to vector
 
 	//output players
-	/*for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 10; i++) {
 		players[i].printInfo();
-	}*/
+	}
 
 
 	//read sessions
-	//vector<Session> session(20);
 	while (getline(ss::sessionList, line)) {
 		sessionList.resize(sessionList.size() + 1);
 		int i = sessionList.size() - 1;
@@ -463,6 +440,8 @@ int main()
 
 		//sessionList.push_back(session[i]);
 	}//input sessions from text file to vector
+
+	//output sessions
 	for (int i = 0; i < sessionList.size(); i++) {
 		cout << sessionList[i].getWinner() << endl;
 		for (int j = 0; j < 5; j++) {
@@ -471,6 +450,7 @@ int main()
 		}
 	}
 
+	//////////////
 	short int arrayPlayerRank[10] = { 1187, 1105, 1100, 1095, 1035, 1050, 1175, 1157, 1108, 1083 };
 	for (int i = 0; i < 10; i++) {
 		players[i].setRank(arrayPlayerRank[i]);
@@ -483,9 +463,10 @@ int main()
 		finders.resize(finders.size() + 1);
 		finders[i] = players[i];
 	}//example
-
 	 //десь тут предполагається створення вектора в який потоком, напевно, будуть 
 	//записуватись плеєри, які шукають ігру, або їхні ID(но тоді трохи треба переписати цей гавно код)
+
+
 
 	int sessionNumber = games.performGameSesion();
 	//start game
