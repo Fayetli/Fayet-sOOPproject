@@ -5,17 +5,23 @@
 #include <fstream>
 #include <string>
 //bugs: 0?
+
 /*ListOfHeroesm ListOfPlayers, ListOfSession реалізовані через глобальні вектори*/
+/*Всі герої, гравці та сесії записуються у тектстові файли*/
+//Не добавлено:перепис файлу з героями(при видаленні героя), перепис файлу з плеєрами(при видаленні, та зміні рангу)
+
 using namespace std;
 
 short int playerCount = 0;
 short int heroCount = 0;
 
+//toRead
 namespace ss {
 	ifstream sessionList("sessionList.txt");
 	ifstream players("players.txt");
 	ifstream heroes("heroes.txt");
 }
+//toWrite
 namespace sv {
 	ofstream sessionList("sessionList.txt", ios::app);
 	ofstream players("players.txt", ios::app);
@@ -334,7 +340,6 @@ public:
 			}
 			cout << "Winner is red!" << endl;
 		}
-
 		for (int i = 0; i < 5; i++) {
 			sv::sessionList << sessionList[sessionNumber - 1].TeamRed[i].player.name << endl;
 		}
@@ -386,6 +391,7 @@ int main()
 		heroCount = i;
 	}//input heroes from text file to vector
 
+	//output heroes
 	/*for (int i = 0; i < heroes.size(); i++) {
 		heroes[i].printInfo();
 	}*/
@@ -402,16 +408,18 @@ int main()
 		playerCount = i;
 	}//input players from text file to vector
 
+	//output players
 	/*for (int i = 0; i < 10; i++) {
 		players[i].printInfo();
 	}*/
 
 
 	//read sessions
-	int i = 0;
-	vector<Session> session(20);
+	//vector<Session> session(20);
 	while (getline(ss::sessionList, line)) {
-		session[i].setWinner(atoi(line.c_str())); //read winner(1 - blue, 0 - red)
+		sessionList.resize(sessionList.size() + 1);
+		int i = sessionList.size() - 1;
+		sessionList[i].setWinner(atoi(line.c_str())); //read winner(1 - blue, 0 - red)
 		getline(ss::sessionList, line);
 		for (int j = 0; j < 10; j++) {
 			toTeamPart[j].player.name = line;
@@ -438,21 +446,22 @@ int main()
 			toTeamPart[j].hero.hp = heroes[toHeroes.getHeroByName(toTeamPart[j].hero.name)].hp;
 		}
 		for (int j = 0; j < 5; j++) {
-			session[i].TeamRed[j] = toTeamPart[j];
+			sessionList[i].TeamRed[j] = toTeamPart[j];
 		}
 
 		for (int j = 5, k = 0; j < 10; j++, k++) {
-			session[i].TeamBlue[k] = toTeamPart[j];
+			sessionList[i].TeamBlue[k] = toTeamPart[j];
 		}
 
-		sessionList.push_back(session[i]);
+		//sessionList.push_back(session[i]);
 	}//input sessions from text file to vector
-	/*for (int i = 0; i < sessionList.size(); i++) {
+	for (int i = 0; i < sessionList.size(); i++) {
+		cout << sessionList[i].getWinner() << endl;
 		for (int j = 0; j < 5; j++) {
 			sessionList[i].TeamRed[j].printInfo();
 			sessionList[i].TeamBlue[j].printInfo();
 		}
-	}*/
+	}
 
 	short int arrayPlayerRank[10] = { 1187, 1105, 1100, 1095, 1035, 1050, 1175, 1157, 1108, 1083 };
 	for (int i = 0; i < 10; i++) {
@@ -482,12 +491,6 @@ int main()
 	games.endGameSession(sessionNumber);
 
 
-	/*for (int i = 0; i < sessionList.size(); i++) {
-		for (int j = 0; j < 5; j++) {
-			sessionList[i].TeamBlue[j].printInfo();
-			sessionList[i].TeamRed[j].printInfo();
-		}
-	}*/
 
 	system("pause");
 
