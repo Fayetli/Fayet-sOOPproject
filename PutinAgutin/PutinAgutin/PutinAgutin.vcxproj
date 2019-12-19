@@ -149,6 +149,15 @@
   <ItemGroup>
     <ClCompile Include="PutinAgutin.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GameManager.h" />
+    <ClInclude Include="Hero.h" />
+    <ClInclude Include="HeroManager.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerManager.h" />
+    <ClInclude Include="Session.h" />
+    <ClInclude Include="TeamPart.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
