@@ -101,21 +101,18 @@ int main()
 	}//input sessions from text file to vector
 	ss::sessionList.close();
 
-	//////////////
+
 	short int arrayPlayerRank[10] = { 1187, 1105, 1100, 1095, 1035, 1050, 1175, 1157, 1108, 1083 };
 	for (int i = 0; i < 10; i++) {
 		toPlayers.players[i].setRank(arrayPlayerRank[i]);
-	}//to example
-	//////////////
+	}//example
 
-	vector<Player> finders(0);
 	//create a vector with players who find a match
+	vector<Player> finders(0);
 	for (int i = 0; i < 10; i++) {
 		finders.resize(finders.size() + 1);
 		finders[i] = toPlayers.players[i];
 	}//example
-	 //десь тут предполагається створення вектора в який потоком, напевно, будуть 
-	//записуватись плеєри, які шукають ігру, або їхні ID(но тоді трохи треба переписати цей гавно код)
 
 	int sessionNumber = games.performGameSesion(finders);
 	//start game
